@@ -33,16 +33,41 @@ Suggested milestones for incremental development:
  -Build the [year, 'name rank', ... ] list and print it
  -Fix main() to use the extract_names list
 """
-
+import re
 def extract_names(filename):
   """
   Given a file name for baby.html, returns a list starting with the year string
   followed by the name-rank strings in alphabetical order.
   ['2006', 'Aaliyah 91', Aaron 57', 'Abagail 895', ' ...]
   """
-  # +++your code here+++
-  return
+  retorno = ''
+  f = open(filename,'rU')
+  dic = {}
+  lista = []
+  arq = f.read()
+  ano = re.search(r'(\d\d\d\d)</h3>',arq)
+  match = re.findall(r'<td>(.*)</td><td>(.*)</td><td>(.*)</td>',arq)
 
+  if ano:
+      lista.append(ano.group(1))
+  if match:
+      for tupla in match:
+          if not dic.get(tupla[1]):
+              dic[tupla[1]] = tupla[0]
+          if not dic.get(tupla[2]):
+              dic[tupla[2]]= tupla[0]
+
+      for k,v in sorted(dic.items()):
+          lista.append('{:5}: {:5}'.format(k,v))
+  return lista 
+  f.close()
+  return 
+
+def file_write(retorno):
+    f = open('summary.txt','a')
+    for linha in retorno:
+        f.write(linha+'\n')
+    f.close()
 
 def main():
   # This command-line parsing code is provided.
@@ -60,6 +85,13 @@ def main():
     summary = True
     del args[0]
 
+  for filename in args:
+    extracao = extract_names(filename)
+    if summary:
+        file_write(extracao)
+    else:
+        for linha in extracao:
+            print linha
   # +++your code here+++
   # For each filename, get the names, then either print the text output
   # or write it to a summary file
